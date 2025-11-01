@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const path = require("../util/path");
 
 exports.getProducts = (req, res, next) => {
   Product.fetchAll((products) => {
@@ -9,6 +10,17 @@ exports.getProducts = (req, res, next) => {
       hasProducts: products.length > 0,
       activeShop: true,
       productCSS: true,
+    });
+  });
+};
+
+exports.getProduct = (req, res, next) => {
+  const proId = req.params.productId;
+  Product.findById(proId, (product) => {
+    res.render("shop/product-detail", {
+      product: product,
+      pageTitle: product.title,
+      path: "/products",
     });
   });
 };
