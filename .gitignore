@@ -1,2 +1,4 @@
 #ignore the node modules 
 node_modules
+shop1.js
+product1(using_static).js
