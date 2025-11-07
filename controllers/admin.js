@@ -14,21 +14,16 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   const product = new Product(null, title, imageUrl, description, price);
-  //the above are the constructor which we use to store the attributes of the products and when we use the that so that we can us id while posting something in our json file
   product.save();
   res.redirect("/");
 };
 
 exports.getEditProduct = (req, res, next) => {
-  //here it check for the value of edit in params
-  //http://localhost:3000/admin/edit-product/12434534?edit=true  due to which the editMode value is true
-
   const editMode = req.query.edit;
   if (!editMode) {
     return res.redirect("/");
   }
   const prodId = req.params.productId;
-
   Product.findById(prodId, (product) => {
     if (!product) {
       return res.redirect("/");
@@ -47,12 +42,13 @@ exports.postEditProduct = (req, res, next) => {
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
   const updatedImageUrl = req.body.imageUrl;
-  const updatedDescription = req.body.description;
+  const updatedDesc = req.body.description;
+
   const updatedProduct = new Product(
     prodId,
     updatedTitle,
     updatedImageUrl,
-    updatedDescription,
+    updatedDesc,
     updatedPrice
   );
   updatedProduct.save();
@@ -70,7 +66,7 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.postDeleteProduct = (req, res, next) => {
-  const proId = req.body.productId;
-  Product.deleteById(proId);
+  const prodId = req.body.productId;
+  Product.deleteById(prodId);
   res.redirect("/admin/products");
 };
