@@ -22,6 +22,7 @@ module.exports = class Cart {
       const existingProduct = cart.products[existingProductIndex];
       let updatedProduct;
       // Add new product/ increase quantity
+      //checking for my push
       if (existingProduct) {
         updatedProduct = { ...existingProduct };
         updatedProduct.qty = updatedProduct.qty + 1;
