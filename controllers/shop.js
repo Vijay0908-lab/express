@@ -1,5 +1,5 @@
 const Product = require("../models/product");
-//const Cart = require("../models/cart");
+const Cart = require("../models/cart");
 
 console.log("Product", Product);
 console.log("Product.fetchAll", Product.fetchAll);

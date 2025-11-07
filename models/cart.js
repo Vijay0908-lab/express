@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const shopController = require("../controllers/shop");
-const { router } = require("../routes/shop");
+// Removed controller/route requires to avoid circular dependency with Product
 
 const p = path.join(
   path.dirname(process.mainModule.filename),
