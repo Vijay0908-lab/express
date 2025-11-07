@@ -1,6 +1,9 @@
 const Product = require("../models/product");
-const Cart = require("../models/cart");
+//const Cart = require("../models/cart");
 
+console.log("Product", Product);
+console.log("Product.fetchAll", Product.fetchAll);
+console.log("Type", typeof Product.fetchAll);
 exports.getProducts = (req, res, next) => {
   Product.fetchAll((products) => {
     res.render("shop/product-list", {
@@ -31,7 +34,7 @@ exports.getIndex = (req, res, next) => {
       prods: products,
       pageTitle: "Shop",
       path: "/",
-      // hasProducts: products.length > 0,
+      hasProducts: products.length > 0,
       // activeShop: true,
       // productCSS: true,
     });
@@ -39,6 +42,7 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
+  console.log("in the get cart function");
   Cart.getCart((cart) => {
     if (!cart) {
       // Add this check
