@@ -6,4 +6,10 @@ shop(MYSQL).js
 product(mysql).js
 diffTempEngine
 cart(fsSystem).js
+app1(beforeMongo).js
+database(sequelize).js
 app1.js
+product(sequelize).js
+admin(sequelize).js
+shop(sequelize).js
+sequelize
