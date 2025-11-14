@@ -15,7 +15,14 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   //this will create the a product where a particular user can have many products in it and all the product will we associated to only one user
-  const product = new Product(title, price, description, imageUrl);
+  const product = new Product(
+    title,
+    price,
+    description,
+    imageUrl,
+    null,
+    req.user._id
+  );
   product
     .save()
     .then((result) => {
@@ -67,7 +74,7 @@ exports.postEditProduct = (req, res, next) => {
   product
     .save()
     .then((result) => {
-      console.log("result in postEdit product in admin.js", result);
+      //console.log("result in postEdit product in admin.js", result);
       res.redirect("/admin/products");
     })
     .catch((err) => {
@@ -91,10 +98,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findByPk(prodId)
-    .then((product) => {
-      return product.destroy();
-    })
+  Product.deleteById(prodId)
     .then((result) => {
       console.log("result in postDelete  product in admin.js", result);
       res.redirect("/admin/products");
