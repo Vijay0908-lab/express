@@ -1,7 +1,8 @@
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
-const mongoConnect = require("./util/database").mongoConnect;
+
+const mongoose = require("mongoose");
 const User = require("./models/user");
 const errorController = require("./controllers/error");
 const app = express();
@@ -25,11 +26,18 @@ app.use((req, res, next) => {
       console.log("error in my use function in admin.js", err);
     });
 });
-app.use("/admin", adminRoutes);
-app.use(shopRoutes);
+//app.use("/admin", adminRoutes);
+//app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-mongoConnect(() => {
-  app.listen(3000);
-});
+mongoose
+  .connect(
+    "mongodb+srv://Vijay4944:Vijay4944@cluster0.9u1hgcw.mongodb.net/shop?appName=Cluster0"
+  )
+  .then((result) => {
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });

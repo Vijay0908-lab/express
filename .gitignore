@@ -13,3 +13,5 @@ product(sequelize).js
 admin(sequelize).js
 shop(sequelize).js
 sequelize
+database(mongo).js
+mongo
