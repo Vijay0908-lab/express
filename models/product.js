@@ -1,3 +1,28 @@
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+
+const productSchema = new Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  imageUrl: {
+    type: String,
+    required: true,
+  },
+});
+//the id is added automatically so for that we dont need to add any specific way to implement the id in this schema
+
+module.exports = mongoose.model("Product", productSchema);
+
 // const mongodb = require("mongodb");
 
 // const getDb = require("../util/database").getDb;
