@@ -14,12 +14,14 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
+
   //this will create the a product where a particular user can have many products in it and all the product will we associated to only one user
   const product = new Product({
     title: title,
     price: price,
     description: description,
     imageUrl: imageUrl,
+    userId: req.user._id,
   });
   product
     .save()
@@ -81,7 +83,9 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
   Product.find()
+    .populate(userId)
     .then((products) => {
+      console.log(products);
       res.render("admin/products", {
         prods: products,
         pageTitle: "Admin Products",

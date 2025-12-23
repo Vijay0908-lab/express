@@ -18,6 +18,11 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 //the id is added automatically so for that we dont need to add any specific way to implement the id in this schema
 

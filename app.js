@@ -16,16 +16,16 @@ const shopRoutes = require("./routes/shop");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// app.use((req, res, next) => {
-//   User.findById("6917780ce6699e007991b933")
-//     .then((user) => {
-//       req.user = new User(user.name, user.email, user.cart, user._id);
-//       next();
-//     })
-//     .catch((err) => {
-//       console.log("error in my use function in admin.js", err);
-//     });
-// });
+app.use((req, res, next) => {
+  User.findById("694af841eabe530aa47a5ceb")
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => {
+      console.log("error in my use function in admin.js", err);
+    });
+});
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
@@ -36,6 +36,19 @@ mongoose
     "mongodb+srv://Vijay4944:Vijay4944@cluster0.9u1hgcw.mongodb.net/shop?appName=Cluster0"
   )
   .then((result) => {
+    User.findOne().then((user) => {
+      if (!user) {
+        const user = new User({
+          name: "vijay",
+          email: "vijay@gmail.com",
+          carts: {
+            items: [],
+          },
+        });
+        user.save();
+      }
+    });
+
     app.listen(3000);
   })
   .catch((err) => {
