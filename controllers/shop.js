@@ -1,5 +1,5 @@
 const Product = require("../models/product");
-// const Cart = require("../models/cart");
+
 // const Order = require("../models/order");
 //findById() with findByPk()
 exports.getProducts = (req, res, next) => {
@@ -48,9 +48,10 @@ exports.getIndex = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   req.user
-    .getCart()
-    .then((products) => {
-      console.log("printing the getcart ", products);
+    .populate("cart.items.productId")
+    .then((user) => {
+      const products = user.cart.items;
+      console.log(products);
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
