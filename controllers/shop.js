@@ -5,7 +5,7 @@ const Order = require("../models/order");
 exports.getProducts = (req, res, next) => {
   Product.find()
     .then((products) => {
-      console.log(products);
+      //console.log(products);
       res.render("shop/product-list", {
         prods: products,
         pageTitle: "All Products",
@@ -51,7 +51,7 @@ exports.getCart = (req, res, next) => {
     .populate("cart.items.productId")
     .then((user) => {
       const products = user.cart.items;
-      console.log(products);
+      //console.log(products);
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
@@ -70,7 +70,7 @@ exports.postCart = (req, res, next) => {
       return req.user.addToCart(product);
     })
     .then((result) => {
-      console.log(result);
+      //console.log(result);
       res.redirect("/cart");
     })
     .catch((err) => {
@@ -94,9 +94,9 @@ exports.postOrder = (req, res, next) => {
   req.user
     .populate("cart.items.productId")
     .then((user) => {
-      console.log(user.cart.items);
+      //console.log(user.cart.items);
       const products = user.cart.items.map((i) => {
-        return { quantity: i.quantity, product: i.product };
+        return { quantity: i.quantity, product: { ...i.productId._doc } };
       });
 
       const order = new Order({
@@ -109,6 +109,9 @@ exports.postOrder = (req, res, next) => {
       return order.save();
     })
     .then((result) => {
+      return req.user.clearCart();
+    })
+    .then(() => {
       res.redirect("/orders");
     })
     .catch((err) => {
@@ -118,9 +121,9 @@ exports.postOrder = (req, res, next) => {
 
 exports.getOrders = (req, res, next) => {
   //this ({include :['products ]}) is also a way to say that also include the products on which this relationship is build in the database
-  req.user
-    .getOrders()
+  Order.find({ "user.userId": req.user._id })
     .then((orders) => {
+      console.log("printing the get order ", orders);
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Your Orders",
