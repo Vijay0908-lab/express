@@ -1,11 +1,21 @@
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
+
+const MONGODB_URI =
+  "mongodb+srv://Vijay4944:Vijay4944@cluster0.9u1hgcw.mongodb.net/shop?appName=Cluster0";
 
 const mongoose = require("mongoose");
 const User = require("./models/user");
 const errorController = require("./controllers/error");
 const app = express();
+
+const store = new MongoDBStore({
+  uri: MONGODB_URI,
+  collection: "session",
+});
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -17,16 +27,15 @@ const authRoutes = require("./routes/auth");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use((req, res, next) => {
-  User.findById("695031a00a1b3435d124e905")
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((err) => {
-      console.log("error in my use function in admin.js", err);
-    });
-});
+app.use(
+  session({
+    secret: "my secret",
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+  })
+);
+
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
@@ -34,9 +43,7 @@ app.use(authRoutes);
 app.use(errorController.get404);
 
 mongoose
-  .connect(
-    "mongodb+srv://Vijay4944:Vijay4944@cluster0.9u1hgcw.mongodb.net/shop?appName=Cluster0"
-  )
+  .connect(MONGODB_URI)
   .then((result) => {
     User.findOne().then((user) => {
       if (!user) {
