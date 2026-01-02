@@ -3,7 +3,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
-
+const csrf = require("csurf");
+const flash = require("connect-flash");
 const MONGODB_URI =
   "mongodb+srv://Vijay4944:Vijay4944@cluster0.9u1hgcw.mongodb.net/shop?appName=Cluster0";
 
@@ -16,7 +17,7 @@ const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: "session",
 });
-
+const csrfProtection = csrf();
 app.set("view engine", "ejs");
 app.set("views", "views");
 
@@ -35,6 +36,8 @@ app.use(
     store: store,
   })
 );
+app.use(flash());
+app.use(csrfProtection);
 
 app.use((req, res, next) => {
   if (!req.session.user) {
@@ -49,7 +52,12 @@ app.use((req, res, next) => {
       console.log(err);
     });
 });
-
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+//this create a csrf token which can be a strong security feature for someone who try to use same webpage like you to cheat someone using your url as every page have their own different token
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);

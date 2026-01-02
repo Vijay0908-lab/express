@@ -1,3 +1,4 @@
+const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 
 exports.getLogin = (req, res, next) => {
@@ -5,31 +6,60 @@ exports.getLogin = (req, res, next) => {
   //   req.get("Cookie").split(";")[1].trim().split("=")[1] === "true";
   //console.log(req.session.user);
   //console.log(req.session.isLoggedIn);
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
   res.render("auth/login", {
     path: "/login",
     pageTitle: "login",
-    isAuthenticated: req.session.isLoggedIn,
+    errorMessage: message,
   });
 };
 exports.getSignup = (req, res, next) => {
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+
   res.render("auth/signup", {
     path: "/signup",
     pageTitle: "Signup",
-    isAuthenticated: false,
+    errorMessage: message,
   });
 };
 exports.postLogin = (req, res, next) => {
-  User.findById("695031a00a1b3435d124e905")
+  const email = req.body.email;
+  const password = req.body.password;
+  User.findOne({ email: email, password: password })
     .then((user) => {
-      req.session.user = user;
-      req.session.isLoggedIn = true;
-      req.session.save((err) => {
-        if (err) {
-          console.log("error while saving ", err);
-        }
-        res.redirect("/");
-      });
-      //req.session.res.redirect("/"); the purpose for save is that so that session is first save then only it redirect to the "/"
+      if (!user) {
+        req.flash("error", "Invalid email or password");
+        return res.redirect("/login");
+      }
+      bcrypt
+        .compare(password, user.password)
+        .then((doMatch) => {
+          if (doMatch) {
+            req.session.user = user;
+            req.session.isLoggedIn = true;
+            return req.session.save((err) => {
+              console.log(err);
+              res.redirect("/");
+            });
+          } else {
+            req.flash("error", "Invalid email or password");
+            return res.redirect("/login");
+          }
+        })
+        //the above then dont cofirm that the password we are compare is actually match or not it return true whether is matched or not
+        .catch((err) => {
+          console.log("error in authentication ", error);
+        });
     })
     .catch((err) => {
       console.log("error in my use function in admin.js", err);
@@ -38,23 +68,29 @@ exports.postLogin = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
+  //const confirmPassword = req.body.confirmPassword;
 
   User.findOne({ email: email })
     .then((userDoc) => {
       if (userDoc) {
+        req.flash("error", "email already exist, Please pick different one");
         return res.redirect("/signup");
       }
-      const user = new User({
-        email: email,
-        password: password,
-        cart: { items: [] },
-      });
-      return user.save();
+      return bcrypt
+        .hash(password, 12)
+        .then((hashPassword) => {
+          const user = new User({
+            email: email,
+            password: hashPassword,
+            cart: { items: [] },
+          });
+          return user.save();
+        })
+        .then((result) => {
+          res.redirect("/login");
+        });
     })
-    .then((result) => {
-      res.redirect("/login");
-    })
+
     .catch((err) => {
       console.log(err);
     });
