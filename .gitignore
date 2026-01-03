@@ -18,5 +18,5 @@ mongo
 data
 cart.json
 product.json
-
+.env
 

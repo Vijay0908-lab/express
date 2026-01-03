@@ -1,33 +1,37 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
-const { MailtrapTransport } = require("mailtrap");
 const Nodemailer = require("nodemailer");
+require("dotenv").config();
 
-const Token = "b01b68f6fe7b18ad26b78db594df1187";
+const transporter = Nodemailer.createTransport({
+  host: "email-smtp.us-east-1.amazonaws.com",
+  port: 587,
+  secure: false, // Use true for port 465, false for port 587
+  auth: {
+    user: process.env.user,
+    pass: process.env.pass,
+  },
+});
 
-const t1 = "70d6d9da04664ffb6f1ebbde3a600e4a";
-const transport = Nodemailer.createTransport(
-  MailtrapTransport({
-    token: Token,
-  })
-);
+function createmailOption({ to, from, subject, html }) {
+  return {
+    from: from,
+    to: to,
+    subject: subject,
+    html: html,
+  };
+}
 
-const sender = {
-  address: "hello@demomailtrap.co",
-  name: "Mailtrap Test",
-};
-
-const recipients = ["chauhanvijay0908@gmail.com"];
-
-transport
-  .sendMail({
-    from: sender,
-    to: recipients,
-    subjects: "you are awesome ",
-    text: "congrats for sending the email ",
-    category: "Integration test",
-  })
-  .then(console.log, console.error);
+function sendEmail({ to, from, subject, html }) {
+  const mailOption = createmailOption({ to, from, subject, html });
+  transporter.sendMail(mailOption, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent:", info.response);
+    }
+  });
+}
 
 exports.getLogin = (req, res, next) => {
   // const isLoggedIn =
@@ -96,7 +100,7 @@ exports.postLogin = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  //const confirmPassword = req.body.confirmPassword;
+  const confirmPassword = req.body.confirmPassword;
 
   User.findOne({ email: email })
     .then((userDoc) => {
@@ -116,6 +120,15 @@ exports.postSignup = (req, res, next) => {
         })
         .then((result) => {
           res.redirect("/login");
+          sendEmail({
+            to: "chauhanvijay0908@gmail.com",
+            from: "chauhanvijay0908@gmail.com",
+            subject: "Signup Succeeded!",
+            html: "<h1>You successfully signed up!</h1>",
+          });
+        })
+        .catch((err) => {
+          console.log(err);
         });
     })
 
