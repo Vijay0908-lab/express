@@ -1,5 +1,33 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
+const { MailtrapTransport } = require("mailtrap");
+const Nodemailer = require("nodemailer");
+
+const Token = "b01b68f6fe7b18ad26b78db594df1187";
+
+const t1 = "70d6d9da04664ffb6f1ebbde3a600e4a";
+const transport = Nodemailer.createTransport(
+  MailtrapTransport({
+    token: Token,
+  })
+);
+
+const sender = {
+  address: "hello@demomailtrap.co",
+  name: "Mailtrap Test",
+};
+
+const recipients = ["chauhanvijay0908@gmail.com"];
+
+transport
+  .sendMail({
+    from: sender,
+    to: recipients,
+    subjects: "you are awesome ",
+    text: "congrats for sending the email ",
+    category: "Integration test",
+  })
+  .then(console.log, console.error);
 
 exports.getLogin = (req, res, next) => {
   // const isLoggedIn =
