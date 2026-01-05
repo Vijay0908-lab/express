@@ -3,18 +3,24 @@ const nodemailer = require("nodemailer");
 const User = require("../models/user");
 
 require("dotenv").config();
-const aws = require("@aws-sdk/client-sesv2");
-
-const ses = new aws.SESv2Client({
-  region: "us-east-1",
-  credentials: {
-    accessKeyId: process.env.AWSAccessKeyID,
-    secretAccessKey: process.env.AWSSecretKey,
+const transporter = nodemailer.createTransport({
+  host: "smtp.resend.com",
+  secure: true,
+  port: 465,
+  auth: {
+    user: "AKIAXU5GOML3SXXH7M5B",
+    pass: "BJWuN8LasiNxzQqTyrJ2gF3gCPPsNbe+9Yt1SojEEsh2",
   },
 });
 
 const transport = nodemailer.createTransport({
-  ses: { ses, aws },
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: "chouhanvijay0908@gmail.com",
+    pass: "", // Replace with real password
+  },
 });
 
 exports.getLogin = (req, res, next) => {
@@ -102,7 +108,7 @@ exports.postSignup = (req, res, next) => {
         .then((result) => {
           res.redirect("/login");
           console.log("about to send message");
-          return transport.sendMail({
+          return transporter.sendMail({
             to: "chauhanvijay0908@gmail.com",
             from: "chouhanvijay0908@gmail.com",
             subject: "Signup succeeded!",
