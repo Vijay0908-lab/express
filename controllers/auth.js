@@ -9,8 +9,8 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: "AKIAXU5GOML3ZKXD3AMT",
-    pass: "BDLDd7pPYYOnrt9xqShLFq1wo2oYlAayxkjkIjvMSGUb",
+    user: process.env.AWS_ACCESS_KEY_ID,
+    pass: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
 
