@@ -5,15 +5,22 @@ const crypto = require("crypto");
 require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.resend.com",
-  secure: true,
-  port: 465,
+  host: "email-smtp.us-east-1.amazonaws.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: "AKIAXU5GOML3SXXH7M5B",
-    pass: "BJWuN8LasiNxzQqTyrJ2gF3gCPPsNbe+9Yt1SojEEsh2",
+    user: "AKIAXU5GOML3ZKXD3AMT",
+    pass: "BDLDd7pPYYOnrt9xqShLFq1wo2oYlAayxkjkIjvMSGUb",
   },
 });
 
+transporter.verify((error, success) => {
+  if (error) {
+    console.log(error);
+  } else {
+    console.log("sucess in smtp ", success);
+  }
+});
 exports.getLogin = (req, res, next) => {
   let message = req.flash("error");
   if (message.length > 0) {
