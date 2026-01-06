@@ -67,23 +67,26 @@ exports.postEditProduct = (req, res, next) => {
 
   Product.findById(prodId)
     .then((product) => {
+      if (product.userId.toString() !== req.user._id.toString()) {
+        return res.redirect("/");
+      }
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.description = updatedDesc;
       product.imageUrl = updatedImageUrl;
-      return product.save();
+      return product.save().then((result) => {
+        //console.log("result in postEdit product in admin.js", result);
+        res.redirect("/admin/products");
+      });
     })
-    .then((result) => {
-      //console.log("result in postEdit product in admin.js", result);
-      res.redirect("/admin/products");
-    })
+
     .catch((err) => {
       console.log("error in postEdit product in admin.js", err);
     });
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({ userId: req.user._id })
     //.populate("userId")
     .then((products) => {
       //console.log(products);
@@ -100,7 +103,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findByIdAndDelete(prodId)
+  Product.deleteOne({ _id: prodId, userId: req.user._id })
     .then((result) => {
       console.log("result in postDelete  product in admin.js", result);
       res.redirect("/admin/products");
