@@ -13,13 +13,15 @@ router.post(
     check("email")
       .isEmail()
       .withMessage("Invalid email or password")
+      .normalizeEmail()
       .custom((value, { req }) => {
         return User.findOne({ email: value }).then((user) => {
           if (!user) {
             return Promise.reject("Enter valid email or password");
           }
         });
-      }),
+      })
+      .trim(),
   ],
   authController.postLogin
 );
@@ -41,13 +43,15 @@ router.post(
             );
           }
         });
-      }),
+      })
+      .normalizeEmail(),
     body("password", "Please a password with atleast 5 character")
       .isLength({ min: 5, max: 12 })
       .isAlphanumeric(),
     body("confirmPassword", "Please enter matching password")
       .isLength({ min: 5, max: 12 })
-      .isAlphanumeric(),
+      .isAlphanumeric()
+      .trim(),
   ],
   authController.postSignup
 );
