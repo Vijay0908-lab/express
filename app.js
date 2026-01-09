@@ -41,6 +41,13 @@ app.use(flash());
 app.use(csrfProtection);
 
 app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
+app.use((req, res, next) => {
+  //throw new Error(err);
   if (!req.session.user) {
     return next();
   }
@@ -53,14 +60,10 @@ app.use((req, res, next) => {
       next();
     })
     .catch((err) => {
-      throw new Error(err);
+      next(new Error(err));
     });
 });
-app.use((req, res, next) => {
-  res.locals.isAuthenticated = req.session.isLoggedIn;
-  res.locals.csrfToken = req.csrfToken();
-  next();
-});
+
 //this create a csrf token which can be a strong security feature for someone who try to use same webpage like you to cheat someone using your url as every page have their own different token
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);

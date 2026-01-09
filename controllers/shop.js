@@ -13,7 +13,9 @@ exports.getProducts = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
 };
 
@@ -29,7 +31,11 @@ exports.getProduct = (req, res, next) => {
         path: "/products",
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
+    });
 };
 
 exports.getIndex = (req, res, next) => {
@@ -42,7 +48,9 @@ exports.getIndex = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
 };
 
@@ -59,7 +67,9 @@ exports.getCart = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log("error in my shop.js in getCart ", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
 };
 
@@ -74,7 +84,9 @@ exports.postCart = (req, res, next) => {
       res.redirect("/cart");
     })
     .catch((err) => {
-      console.log("error in postcart ", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
 };
 
@@ -86,7 +98,9 @@ exports.postCartDeleteProduct = (req, res, next) => {
       res.redirect("/cart");
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
 };
 
@@ -115,7 +129,9 @@ exports.postOrder = (req, res, next) => {
       res.redirect("/orders");
     })
     .catch((err) => {
-      console.log("error is postOrder", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
 };
 
@@ -131,6 +147,8 @@ exports.getOrders = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
 };
