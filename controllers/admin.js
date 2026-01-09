@@ -1,6 +1,6 @@
 const { validationResult } = require("express-validator");
 const Product = require("../models/product");
-
+const mongoose = require("mongoose");
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
@@ -52,7 +52,13 @@ exports.postAddProduct = (req, res, next) => {
       res.redirect("/admin/products");
     })
     .catch((err) => {
-      console.log("printing the error in admin.js ", err);
+      // console.log("printing the error in admin.js ", err);
+      //res.redirect("/500");
+
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
+      //this is will skip the inbetween middleware and run the middleware in which error is shown
     });
 };
 
@@ -78,7 +84,9 @@ exports.getEditProduct = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log("error at getEditProduct in admin.js ", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
 };
 
@@ -125,7 +133,9 @@ exports.postEditProduct = (req, res, next) => {
     })
 
     .catch((err) => {
-      console.log("error in postEdit product in admin.js", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
 };
 
@@ -141,7 +151,9 @@ exports.getProducts = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log("error in getProduct in admin.js", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
 };
 
@@ -153,7 +165,9 @@ exports.postDeleteProduct = (req, res, next) => {
       res.redirect("/admin/products");
     })
     .catch((err) => {
-      console.log("error in postDestroyed Product in admin.js", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
   // res.redirect("/admin/products");
 };

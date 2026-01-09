@@ -4,15 +4,15 @@ const User = require("../models/user");
 const crypto = require("crypto");
 const { validationResult } = require("express-validator");
 
-require("dotenv").config();
+require("dotenv").config({ path: __dirname + "/.env" });
 
 const transporter = nodemailer.createTransport({
   host: "email-smtp.us-east-1.amazonaws.com",
   port: 587,
   secure: false,
   auth: {
-    user: "AKIAXU5GOML3ZKXD3AMT",
-    pass: "BDLDd7pPYYOnrt9xqShLFq1wo2oYlAayxkjkIjvMSGUb",
+    user: process.env.key,
+    pass: process.env.password,
   },
 });
 
@@ -117,8 +117,9 @@ exports.postLogin = (req, res, next) => {
           });
         })
         .catch((err) => {
-          console.log(err);
-          res.redirect("/login");
+          const error = new Error(err);
+          error.httpStatusCode = 500;
+          next(error);
         });
     })
     .catch((err) => console.log(err));
@@ -166,7 +167,9 @@ exports.postSignup = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
 };
 
@@ -278,6 +281,8 @@ exports.postNewpassword = (req, res, next) => {
       return res.redirect("/login");
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
     });
 };
