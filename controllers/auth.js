@@ -4,15 +4,15 @@ const User = require("../models/user");
 const crypto = require("crypto");
 const { validationResult } = require("express-validator");
 
-require("dotenv").config();
+require("dotenv").config({ path: __dirname + "/.env" });
 
 const transporter = nodemailer.createTransport({
   host: "email-smtp.us-east-1.amazonaws.com",
   port: 587,
   secure: false,
   auth: {
-    user: "AKIAXU5GOML3ZKXD3AMT",
-    pass: "BDLDd7pPYYOnrt9xqShLFq1wo2oYlAayxkjkIjvMSGUb",
+    user: process.env.key,
+    pass: process.env.password,
   },
 });
 
