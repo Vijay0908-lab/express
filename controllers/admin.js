@@ -14,13 +14,31 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
-  const image = req.body.image;
+  const image = req.file;
   const price = req.body.price;
   const description = req.body.description;
 
-  //this will create the a product where a particular user can have many products in it and all the product will we associated to only one user
+  console.log("in the postAdd");
+  console.log(image);
   const error = validationResult(req);
-  console.log(error);
+
+  if (!image) {
+    console.log(image);
+    return res.status(422).render("admin/edit-product", {
+      pageTitle: "Add Product",
+      path: "/admin/edit-product",
+      hasError: true,
+      editing: false,
+      product: {
+        title: title,
+        price: price,
+        description: description,
+      },
+      errorMessage: "Attached file is not an image",
+      validationErrors: [],
+    });
+  }
+
   if (!error.isEmpty()) {
     return res.status(422).render("admin/edit-product", {
       pageTitle: "Add Product",
@@ -29,7 +47,6 @@ exports.postAddProduct = (req, res, next) => {
       editing: false,
       product: {
         title: title,
-        imageUrl: imageUrl,
         price: price,
         description: description,
       },
@@ -37,6 +54,9 @@ exports.postAddProduct = (req, res, next) => {
       validationErrors: error.array(),
     });
   }
+
+  const imageUrl = image.path;
+
   const product = new Product({
     title: title,
     price: price,
@@ -47,18 +67,14 @@ exports.postAddProduct = (req, res, next) => {
   product
     .save()
     .then((result) => {
-      //console.log("printing the result in admin.js ", result);
       console.log("in the post add product");
       res.redirect("/admin/products");
     })
     .catch((err) => {
-      // console.log("printing the error in admin.js ", err);
-      //res.redirect("/500");
-
+      console.log("error in postADD");
       const error = new Error(err);
       error.httpStatusCode = 500;
       next(error);
-      //this is will skip the inbetween middleware and run the middleware in which error is shown
     });
 };
 
@@ -94,7 +110,7 @@ exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
+  const updatedImageUrl = req.file;
   const updatedDesc = req.body.description;
 
   const error = validationResult(req);
@@ -107,7 +123,7 @@ exports.postEditProduct = (req, res, next) => {
       editing: true,
       product: {
         title: updatedTitle,
-        imageUrl: updatedImageUrl,
+        //imageUrl: updatedImageUrl,
         price: updatedPrice,
         description: updatedDesc,
         _id: prodId,
@@ -125,7 +141,7 @@ exports.postEditProduct = (req, res, next) => {
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.description = updatedDesc;
-      product.imageUrl = updatedImageUrl;
+      //product.imageUrl = updatedImageUrl;
       return product.save().then((result) => {
         //console.log("result in postEdit product in admin.js", result);
         res.redirect("/admin/products");

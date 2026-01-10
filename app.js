@@ -12,12 +12,39 @@ const mongoose = require("mongoose");
 const User = require("./models/user");
 const errorController = require("./controllers/error");
 const app = express();
+const multer = require("multer");
 
 const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: "session",
 });
 const csrfProtection = csrf();
+
+//this is used to storage the image in the way we want to store it as we can control its path and its naming
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      new Date.isISOString().replace(/:/g, "-") + "-" + file.originalname
+    );
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    console.log("failedd");
+    cb(null, false);
+  }
+};
 app.set("view engine", "ejs");
 app.set("views", "views");
 
@@ -27,6 +54,12 @@ const authRoutes = require("./routes/auth");
 const { error } = require("console");
 
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(
+  console.log("about to store the file"),
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
+
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(
