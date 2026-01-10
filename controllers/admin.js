@@ -18,15 +18,13 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
 
-  console.log("in the postAdd");
-  console.log(image);
   const error = validationResult(req);
 
   if (!image) {
     console.log(image);
     return res.status(422).render("admin/edit-product", {
       pageTitle: "Add Product",
-      path: "/admin/edit-product",
+      path: "/admin/add-product",
       hasError: true,
       editing: false,
       product: {
@@ -40,14 +38,16 @@ exports.postAddProduct = (req, res, next) => {
   }
 
   if (!error.isEmpty()) {
+    console.log(err.array());
     return res.status(422).render("admin/edit-product", {
       pageTitle: "Add Product",
-      path: "/admin/edit-product",
+      path: "/admin/add-product",
       hasError: true,
       editing: false,
       product: {
         title: title,
         price: price,
+        imageUrl: imageUrl,
         description: description,
       },
       errorMessage: error.array()[0].msg,
@@ -110,7 +110,7 @@ exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
-  const updatedImageUrl = req.file;
+  const image = req.file;
   const updatedDesc = req.body.description;
 
   const error = validationResult(req);
@@ -141,6 +141,9 @@ exports.postEditProduct = (req, res, next) => {
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.description = updatedDesc;
+      if (image) {
+        product.imageUrl = image.path;
+      }
       //product.imageUrl = updatedImageUrl;
       return product.save().then((result) => {
         //console.log("result in postEdit product in admin.js", result);
