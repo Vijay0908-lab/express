@@ -2,6 +2,7 @@ const Product = require("../models/product");
 const Order = require("../models/order");
 const fs = require("fs");
 const path = require("path");
+const PDFDocument = require("pdfkit");
 // const Order = require("../models/order");
 //findById() with findByPk()
 exports.getProducts = (req, res, next) => {
@@ -171,18 +172,56 @@ exports.getInvoice = (req, res, next) => {
       const invoiceName = "invoice-" + orderId + ".pdf";
       const invoicePath = path.join("data", "invoices", invoiceName);
 
+      const pdfDoc = new PDFDocument();
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        "inline; filename=" + invoiceName + '"'
+      );
+      pdfDoc.pipe(fs.createWriteStream(invoicePath));
+      pdfDoc.pipe(res);
+
+      pdfDoc.fontSize(26).text("Invoice", {
+        underline: true,
+      });
+
+      pdfDoc.text("--------------------------");
+      let TotalPrice = 0;
+      order.products.forEach((prod) => {
+        TotalPrice = TotalPrice + prod.quantity * prod.product.price;
+
+        pdfDoc
+          .fontSize(14)
+          .text(
+            prod.product.title +
+              "---" +
+              " " +
+              prod.quantity +
+              +"  " +
+              "x" +
+              " " +
+              "$" +
+              prod.product.price
+          );
+      });
+      pdfDoc.fontSize(26).text("-----------------");
+      pdfDoc.fontSize(20).text("Total Price : $" + TotalPrice);
+      pdfDoc.end();
       //make sure the invoiceName and invoicepath should in this chrology only else it will give error
 
-      fs.readFile(invoicePath, (err, data) => {
-        if (err) {
-          return next(err);
-        }
+      // fs.readFile(invoicePath, (err, data) => {
+      //   if (err) {
+      //     return next(err);
+      //   }
 
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", "inline; filename=" + invoiceName);
+      //   res.setHeader("Content-Type", "application/pdf");
+      //   res.setHeader("Content-Disposition", "inline; filename=" + invoiceName);
 
-        res.send(data);
-      });
+      //   res.send(data);
+      // });
+      // const file = fs.createReadStream(invoicePath);
+
+      // file.pipe(res);
     })
     .catch((err) => {
       return next(err);
