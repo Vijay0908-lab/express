@@ -91,6 +91,7 @@ exports.getIndex = (req, res, next) => {
 exports.getCart = (req, res, next) => {
   req.user
     .populate("cart.items.productId")
+
     .then((user) => {
       const products = user.cart.items;
       //console.log(products);
@@ -101,6 +102,7 @@ exports.getCart = (req, res, next) => {
       });
     })
     .catch((err) => {
+      console.log(err);
       const error = new Error(err);
       error.httpStatusCode = 500;
       next(error);
@@ -118,6 +120,7 @@ exports.postCart = (req, res, next) => {
       res.redirect("/cart");
     })
     .catch((err) => {
+      console.log(err);
       const error = new Error(err);
       error.httpStatusCode = 500;
       next(error);
