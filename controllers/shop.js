@@ -183,7 +183,6 @@ exports.getCheckout = (req, res, next) => {
           razorpayKeyId: process.env.rzKey,
         });
       });
-      \.then()
     })
     .catch((err) => {
       console.log(err);
