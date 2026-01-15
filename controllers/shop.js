@@ -4,8 +4,15 @@ const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
 const ITEMS_PER_PAGE = 2;
-// const Order = require("../models/order");
-//findById() with findByPk()
+const Razorpay = require("razorpay");
+//const require = require("require");
+require("dotenv").config({ path: __dirname + "/.env" });
+
+const rzp = new Razorpay({
+  key_id: process.env.rzKey, // your `KEY_ID`
+  key_secret: process.env.rzPass, // your `KEY_SECRET`
+});
+
 exports.getProducts = (req, res, next) => {
   const page = +req.query.page || 1;
   let totalItems;
@@ -142,22 +149,41 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.getCheckout = (req, res, next) => {
+  let products;
+  let total;
   req.user
     .populate("cart.items.productId")
 
     .then((user) => {
-      const products = user.cart.items;
-      let total = 0;
+      products = user.cart.items;
+      total = 0;
       products.forEach((p) => {
         total += p.quantity * p.productId.price;
       });
-      //console.log(products);
-      res.render("shop/checkout", {
-        path: "/checkout",
-        pageTitle: "Checkout",
-        products: products,
-        totalSum: total,
+    })
+    .then((result) => {
+      const option = {
+        amount: total * 100,
+        currency: "INR",
+        receipt: "receipt #1",
+        //payment_captures: 1,
+      };
+      rzp.orders.create(option, async function (err, order) {
+        if (err) {
+          console.log(err);
+          const error = new Error(err);
+          error.httpStatusCode = 500;
+          return next(error);
+        }
+        return res.render("shop/checkout", {
+          products: products,
+          pageTitle: "/checkout",
+          totalAmount: total,
+          orderId: order.id,
+          razorpayKeyId: process.env.rzKey,
+        });
       });
+      \.then()
     })
     .catch((err) => {
       console.log(err);
@@ -267,21 +293,6 @@ exports.getInvoice = (req, res, next) => {
       pdfDoc.fontSize(26).text("-----------------");
       pdfDoc.fontSize(20).text("Total Price : $" + TotalPrice);
       pdfDoc.end();
-      //make sure the invoiceName and invoicepath should in this chrology only else it will give error
-
-      // fs.readFile(invoicePath, (err, data) => {
-      //   if (err) {
-      //     return next(err);
-      //   }
-
-      //   res.setHeader("Content-Type", "application/pdf");
-      //   res.setHeader("Content-Disposition", "inline; filename=" + invoiceName);
-
-      //   res.send(data);
-      // });
-      // const file = fs.createReadStream(invoicePath);
-
-      // file.pipe(res);
     })
     .catch((err) => {
       return next(err);

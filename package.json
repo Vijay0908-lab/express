@@ -32,6 +32,8 @@
     "nodemailer": "^7.0.12",
     "pdfkit": "^0.17.2",
     "pug": "^3.0.3",
-    "sequelize": "^6.37.7"
+    "razorpay": "^2.9.6",
+    "sequelize": "^6.37.7",
+    "short-uuid": "^6.0.3"
   }
 }
