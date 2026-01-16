@@ -1,4 +1,4 @@
-<!-- <%- include('../includes/head.ejs') %>
+<%- include('../includes/head.ejs') %>
     <link rel="stylesheet" href="/css/cart.css">
     
     </head>
@@ -19,98 +19,16 @@
             </div>
             <div class="centered">
                 <button id="order-btn" class="btn">ORDER</button>
-                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                <script src="https://js.stripe.com/v3/"></script>
                 <script>
-                    var razorPay = Stripe('rzp_test_S3Ubzm09UVdD1C');
+                    var stripe = Stripe('pk_test_51SpxFuE0FCS4HaETH70dMIHosHiBRcDbAv8ImkY3imQFCTLvh8FjvudKulXyr1JChdjubicKvqz5GvHm9vr1vwo900dwTIq2eX');
                     var orderBtn = document.getElementById('order-btn');
                     orderBtn.addEventListener('click', function() {
-                        razorPay.redirectToCheckout({
+                        stripe.redirectToCheckout({
                             sessionId: '<%= sessionId %>'
                         });
                     });
                 </script>
             </div>
         </main>
-        <%- include('../includes/end.ejs') %> -->
-
-
-        <%- include('../includes/head.ejs') %>
-    <link rel="stylesheet" href="/css/cart.css">
-    </head>
-
-    <body>
-        <%- include('../includes/navigation.ejs') %>
-        <main>
-            <ul class="cart__item-list">
-                <% products.forEach(p => { %>
-                    <li class="cart__item">
-                        <h1><%= p.productId.title %></h1>
-                        <h2>Quantity: <%= p.quantity %></h2>
-                    </li>
-                <% }) %>
-            </ul>
-            <div class="centered">
-                <h2>Total: ₹<%= totalSum %></h2>
-            </div>
-            <div class="centered">
-                <button id="order-btn" class="btn">PAY NOW</button>
-            </div>
-        </main>
-
-        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-        <script>
-            var orderBtn = document.getElementById('order-btn');
-            orderBtn.addEventListener('click', function() {
-                var options = {
-                    key: '<%= keyId %>', // Key ID from backend
-                    amount: <%= totalSum * 100 %>, // Amount in paise
-                    currency: 'INR',
-                    name: 'Your Store Name',
-                    description: 'Purchase Order',
-                    order_id: '<%= orderId %>', // Order ID from backend
-                    handler: function (response) {
-                        // Send payment details to backend for verification
-                        fetch('/verify-payment', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature
-                            })
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                window.location.href = data.redirectUrl;
-                            } else {
-                                alert('Payment verification failed!');
-                            }
-                        })
-                        .catch(err => {
-                            console.error('Error:', err);
-                            alert('Something went wrong!');
-                        });
-                    },
-                    prefill: {
-                        name: '<%= user.name || "Customer" %>',
-                        email: '<%= user.email || "" %>',
-                    },
-                    theme: {
-                        color: '#3399cc'
-                    }
-                };
-
-                var rzp = new Razorpay(options);
-                
-                rzp.on('payment.failed', function (response) {
-                    alert('Payment Failed! ' + response.error.description);
-                });
-
-                rzp.open();
-            });
-        </script>
-
         <%- include('../includes/end.ejs') %>
