@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 require("dotenv").config({ path: __dirname + "/.env" });
-const csrf = require("csurf");
+const csrf = require("@dr.pogodin/csurf");
 const flash = require("connect-flash");
 const MONGODB_URI = process.env.mongo_URL;
 
@@ -114,3 +114,5 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
+
+module.exports = app;
